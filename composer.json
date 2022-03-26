@@ -1,0 +1,15 @@
+{
+    "name": "mohammadiani/trust-pilot",
+    "autoload": {
+        "psr-4": {
+            "Mohammadiani\\TrustPilot\\": "inc/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mohammadiani",
+            "email": "yoosef.m.1374@gmail.com"
+        }
+    ],
+    "require": {}
+}
