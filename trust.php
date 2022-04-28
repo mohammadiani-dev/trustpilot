@@ -9,6 +9,8 @@ Domain Path: /languages
 Author URI: http://mohammadiani.com
 */
 
+//in yek update baraye check kardane
+
 if(!defined("TRUST_PILOT_PATH")) define("TRUST_PILOT_PATH",plugin_dir_path(__FILE__));
 if(!defined("TRUST_PILOT_URL")) define("TRUST_PILOT_URL",plugin_dir_url(__FILE__));
 if(!defined("TRUST_PILOT_DB_VER")) define("TRUST_PILOT_DB_VER","1.0.1");
