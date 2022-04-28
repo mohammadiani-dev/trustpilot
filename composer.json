@@ -2,7 +2,7 @@
     "name": "mohammadiani/trust-pilot",
     "autoload": {
         "psr-4": {
-            "Mohammadiani\\TrustPilot\\": "inc/"
+            "TrustPilot\\": "inc/classes"
         }
     },
     "authors": [
