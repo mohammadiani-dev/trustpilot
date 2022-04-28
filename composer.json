@@ -11,5 +11,7 @@
             "email": "yoosef.m.1374@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "google/apiclient": "^2.12.1"
+    }
 }

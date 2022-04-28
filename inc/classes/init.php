@@ -21,7 +21,6 @@ class init{
 
     public function init_google_api(){
 
-        require_once TRUST_PILOT_PATH . 'inc/google-api/vendor/autoload.php';
         $gClient = new Google_Client();
         $gClient->setClientId("315275401202-3rv3cum8fr5dibvdejs3aomcks63vtph.apps.googleusercontent.com");
         $gClient->setClientSecret("c9owW3nh5r73K6I4SKaAPhGA");
