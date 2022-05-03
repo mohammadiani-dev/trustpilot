@@ -17,6 +17,7 @@ if(!defined("TRUST_PILOT_DB_VER")) define("TRUST_PILOT_DB_VER","1.0.1");
 if(!defined("TRUST_PILOT_ASSETS_VER")) define("TRUST_PILOT_ASSETS_VER","9.8.0");
 if(!defined("TRUST_PILOT_PREFIX")) define("TRUST_PILOT_PREFIX","trpi_");
 
+use TrustPilot\htmlToJpeg;
 use TrustPilot\init;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -94,5 +95,10 @@ function wpse26388_query_vars( $query_vars ){
 }
 
 
+add_action("init", function(){
+    if(!current_user_can( 'manage_options' )){
+        add_filter( 'show_admin_bar', '__return_false' );
+    }
 
 
+});

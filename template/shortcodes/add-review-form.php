@@ -2,19 +2,22 @@
 
 <?php
 
+use TrustPilot\business;
 use TrustPilot\functions;
 
 function trpi_add_form_section_shortcode(){
     ob_start();
 
+
     if(! (isset($_GET['post_id']) && (int)$_GET['post_id'] > 0 && get_post_type((int)$_GET['post_id']) == 'business') ){
         return;
     }
 
-    
 
 
     $post_id = (int)$_GET['post_id'];
+
+
     ?>
     <div class="trpi_add_review_form" data-ajax="<?php echo admin_url("admin-ajax.php"); ?>" data-post-id="<?php echo $post_id; ?>">
         <div class="rating-section">
@@ -72,7 +75,9 @@ function trpi_add_form_section_shortcode(){
             </div>
             <div class="item-body">
                 <div class="meta">
-                    <div class="buisiness_star_rating_for_image" data-rating="<?php echo $_GET['star']; ?>"></div>
+                    <div class="trpi_wrapper_star">
+                        <div class="trpi_star_valid"></div>
+                    </div>
                 </div>
                 <h5 class="review-title"></h5>
                 <p class="review-content"></p>
@@ -84,6 +89,22 @@ function trpi_add_form_section_shortcode(){
             </div>
         </div>
     </div>
+
+    <div class="trpi_badge_holder">
+        <div id='company_badge_box' >
+            <div class="trpi_wrapper_logo">
+                <img width="150" src="<?php echo TRUST_PILOT_URL.'/assets/images/logo.png' ?>">
+            </div>
+            <div class="trpi_wrapper_star">
+                <div class="trpi_star_valid"></div>
+            </div>
+            <div class="trpi_wrapper_meta">
+                <span> امتیاز </span><strong class="level"></strong>
+                <p><span> از </span><strong class="total"></strong><strong> تجربه </strong></p>
+            </div>
+        </div> 
+    </div>
+    
 
 
     <?php

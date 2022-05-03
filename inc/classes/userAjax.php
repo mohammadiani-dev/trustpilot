@@ -40,6 +40,55 @@ class userAjax{
         add_action("wp_ajax_nopriv_trpi_forgot_password" , [$this , 'trpi_forgot_password_callback']);
         add_action("wp_ajax_nopriv_trpi_reset_password" , [$this , 'trpi_reset_password_callback']);
         
+        add_action("wp_ajax_trpi_update_badge_and_image_review" , [$this , 'trpi_update_badge_and_image_review_callback']);
+
+        
+    }
+
+    public function trpi_update_badge_and_image_review_callback(){
+        $post_id = (int)sanitize_text_field( $_POST['post_id'] );
+        $review_id = (int)sanitize_text_field(  $_POST['review_id'] );
+        if(isset($_POST['review_img'])){
+            $img = sanitize_text_field( $_POST['review_img'] ); // Your data 'data:image/png;base64,AAAFBfj42Pj4';
+            $img = str_replace('data:image/png;base64,', '', $img);
+            $img = str_replace(' ', '+', $img);
+            $data = base64_decode($img);
+
+            $upload_dir = wp_upload_dir();
+            $upload_dir = $upload_dir['basedir'] . '/reviews/'.$post_id;
+            if(!file_exists($upload_dir)) wp_mkdir_p($upload_dir);
+
+            // Write the log file.
+            $file  = $upload_dir . '/'.$review_id.'.jpg';
+            $file  = fopen($file, 'a');
+            fwrite($file, $data);
+            fclose($file);
+
+        }
+        if(isset($_POST['badge_img'])){
+            $img = sanitize_text_field($_POST['badge_img']); // Your data 'data:image/png;base64,AAAFBfj42Pj4';
+
+            $img = str_replace('data:image/png;base64,', '', $img);
+            $img = str_replace(' ', '+', $img);
+            $data = base64_decode($img);
+
+            $upload_dir = wp_upload_dir();
+            $upload_dir = $upload_dir['basedir'] . '/business/'.$post_id;
+            if(!file_exists($upload_dir)) wp_mkdir_p($upload_dir);
+
+            // Write the log file.
+            $file  = $upload_dir . DIRECTORY_SEPARATOR .'badge.jpg';
+            if(file_exists($file)){
+                unlink($file);
+            }
+                
+            $file  = fopen($file, 'a');
+            fwrite($file, $data);
+            fclose($file);
+
+
+        }
+        wp_send_json_success();
     }
 
     public function trpi_resend_otp_code_callback(){
@@ -218,13 +267,19 @@ class userAjax{
                 $oAuth = new Google_Service_Oauth2($gClient);
                 $userData = $oAuth->userinfo_v2_me->get();
             }
-
+            
             // check if user email already registered
             if(!email_exists($userData['email'])){
                 // generate password
                 $bytes = openssl_random_pseudo_bytes(2);
                 $password = md5(bin2hex($bytes));
-                $user_login = $userData['id'];
+
+
+                do{
+                    $user_login = "user-" . rand(1111 , 9999) . '-' . rand(1111 , 9999)  . '-' . rand(1111 , 9999);
+                }while(username_exists( $user_login ));
+        
+                $user_login = sanitize_user( $user_login );
 
 
                 $new_user_id = wp_insert_user(array(
@@ -234,7 +289,7 @@ class userAjax{
                     'first_name'		=> $userData['givenName'],
                     'last_name'			=> $userData['familyName'],
                     'user_registered'	=> date('Y-m-d H:i:s'),
-                    'role'				=> 'subscriber'
+                    'role'				=> 'reviewer'
                     )
                 );
                 if($new_user_id) {
@@ -508,7 +563,7 @@ class userAjax{
             'comment_content' => sanitize_text_field( $_POST["content"] ),
             'comment_post_ID' => (int)sanitize_text_field( $_POST["post_id"] ),
             'comment_type' => sanitize_text_field( "trpi_review" ),
-            'comment_approved' => 0,
+            'comment_approved' => 1,
             'user_id' => $user->ID,
             'comment_meta' => [
                 'star' => (int) $_POST["star"] ,
@@ -516,25 +571,24 @@ class userAjax{
             ],
         ]);
 
-        if($insert){
-            $img = $_POST['dataImage']; // Your data 'data:image/png;base64,AAAFBfj42Pj4';
-            $img = str_replace('data:image/jpeg;base64,', '', $img);
-            $img = str_replace(' ', '+', $img);
-            $data = base64_decode($img);
-
-            $upload_dir = wp_upload_dir();
-            $upload_dir = $upload_dir['basedir'] . '/reviews/'.(int)sanitize_text_field( $_POST["post_id"] );
-            if(!file_exists($upload_dir)) wp_mkdir_p($upload_dir);
-
-            // Write the log file.
-            $file  = $upload_dir . '/'.$insert.'.jpg';
-            $file  = fopen($file, 'a');
-            fwrite($file, $data);
-            fclose($file);
+        if($insert > 0){
+            $post_id = (int)sanitize_text_field( $_POST["post_id"] );
+            $bussiness = new business($post_id);
+            $star = round($bussiness->get_review_average() , 2);
+            $data = [
+                'star'=> $star,
+                'title' => sanitize_text_field($_POST["title"]),
+                'rating' => (int) $_POST["star"],
+                'content' => sanitize_text_field( $_POST["content"] ),
+                'post_id' =>  $post_id, 
+                'review_id' => $insert,
+                'width'=> ($star / 5) * 100,
+                'level'=> $bussiness->get_level(),
+                'total' => $bussiness->get_reviews()['total'],
+            ];
+            wp_send_json_success($data);
         }
-
-
-        wp_send_json($insert > 0 ? true : "خطا پایگاه داده!");
+        wp_send_json_error("خطا پایگاه داده!");
         
     }
 

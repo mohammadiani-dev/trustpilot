@@ -21,15 +21,19 @@ class init{
 
     public function init_google_api(){
 
-        $gClient = new Google_Client();
-        $gClient->setClientId("315275401202-3rv3cum8fr5dibvdejs3aomcks63vtph.apps.googleusercontent.com");
-        $gClient->setClientSecret("c9owW3nh5r73K6I4SKaAPhGA");
-        $gClient->setApplicationName("behtarin");
-        $gClient->setRedirectUri(   add_query_arg([ 'action' =>  'trpi_login_with_google' ],admin_url('admin-ajax.php'))   );
-        $gClient->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
-
         // login URL
-        $login_url = $gClient->createAuthUrl();
+        
+        if(!is_user_logged_in()){
+            $gClient = new Google_Client();
+            $GLOBALS['gClient'] = $gClient;
+            $gClient->setClientId("532487010082-8hj4rtsmhmhcjjqk5o6rm1sipbfusmu4.apps.googleusercontent.com");
+            $gClient->setClientSecret("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");
+            $gClient->setApplicationName("behtarin.company");
+            $gClient->setRedirectUri(   add_query_arg([ 'action' =>  'trpi_login_with_google' ],admin_url('admin-ajax.php'))   );
+            $gClient->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
+            $login_url = $gClient->createAuthUrl();
+            $GLOBALS['login_url'] = $login_url;
+        }
 
     }
 

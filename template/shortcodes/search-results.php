@@ -1,9 +1,11 @@
 <?php
 
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
-
-function trpi_buisiness_archive_shortcode(){
+function trpi_search_result_shortcode(){
     ob_start();
+    if(!isset($_GET['search']) || empty($_GET['search'])){
+            echo "امکان نمایش نتایج بدون سرچ وجود ندارد!";
+        return;
+    }
 
     global $wpdb;
     $post_tbl = $wpdb->prefix.'posts';
@@ -72,10 +74,9 @@ function trpi_buisiness_archive_shortcode(){
     
     $query .= " LIMIT $offset, $per_page ";
 
-    $result = $wpdb->get_results($query);
-    
 
-    
+    $result = $wpdb->get_results($query);
+
     if(count($result) > 0):
 
     foreach($result as $data):
@@ -105,15 +106,19 @@ function trpi_buisiness_archive_shortcode(){
         <?php
     endforeach;
 
-    endif;
+    else:;
+
+        echo sprintf(__('هیچ نتیجه ای برای عبارت "%s" پیدا نشد!') , $search);
+
+    endif;;
 
     $data = [
         'total_page' => $total_page,
         'page'  => ( get_query_var('cpage') ? get_query_var('cpage') : 1 ),
     ];
     include_once TRUST_PILOT_PATH . "template/widgets/pagination.php";
-    
+
     return ob_get_clean();
 }
 
-add_shortcode("trpi_buisiness_archive" , "trpi_buisiness_archive_shortcode");
+add_shortcode("trpi_search_result" , "trpi_search_result_shortcode");

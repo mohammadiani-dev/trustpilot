@@ -167,6 +167,70 @@
         }
     }
 }
+#fansy_review_thumb{
+        .trpi_star_valid {
+            position: absolute;
+            height: 100%;
+            background: url(data:image/svg+xml;base64,PHN2Zw0KCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwOC45IiBoZWlnaHQ9IjEwMy42IiB2aWV3Qm94PSIwIDAgMTA4LjkgMTAzLjYiPg0KCTxkZWZzPg0KCQk8c3R5bGU+LmNscy0xe2ZpbGw6I2YxYzk0Nzt9PC9zdHlsZT4NCgk8L2RlZnM+DQoJPHRpdGxlPnN0YXIxPC90aXRsZT4NCgk8ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIj4NCgkJPGcgaWQ9IkxheWVyXzEtMiIgZGF0YS1uYW1lPSJMYXllciAxIj4NCgkJCTxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI1NC40IDAgNzEuMyAzNC4xIDEwOC45IDM5LjYgODEuNyA2Ni4xIDg4LjEgMTAzLjYgNTQuNCA4NS45IDIwLjggMTAzLjYgMjcuMiA2Ni4xIDAgMzkuNiAzNy42IDM0LjEgNTQuNCAwIi8+DQoJCTwvZz4NCgk8L2c+DQo8L3N2Zz4NCg==);
+            background-repeat: repeat-x;
+            background-size: 35px;
+            left: 0;
+            top: 0;
+        }
+        
+        .trpi_wrapper_star {
+            position: relative;
+            display: inline-block;
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDguOSIgaGVpZ2h0PSIxMDMuNiIgdmlld0JveD0iMCAwIDEwOC45IDEwMy42Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UzZTZlNjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnN0YXJfMDwvdGl0bGU+PGcgaWQ9IkxheWVyXzIiIGRhdGEtbmFtZT0iTGF5ZXIgMiI+PGcgaWQ9IkxheWVyXzEtMiIgZGF0YS1uYW1lPSJMYXllciAxIj48cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMTA4LjkgMzkuNiA3MS4zIDM0LjEgNTQuNCAwIDM3LjYgMzQuMSAwIDM5LjYgMjcuMiA2Ni4xIDIwLjggMTAzLjYgNTQuNCA4NS45IDg4LjEgMTAzLjYgODEuNyA2Ni4xIDEwOC45IDM5LjYiLz48L2c+PC9nPjwvc3ZnPg0K);
+            background-position: 0 0;
+            background-repeat: repeat-x;
+            width: 174px;
+            height: 35px;
+            background-size: 35px;
+        }
+}
+.trpi_badge_holder{
+    display: none;
+}
+#company_badge_box{
+        width: 140px;
+        background: #000032;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #f0f0f0;
+        padding: 16px 16px;
+        font-size: 14px;
+        margin: 16px 0;
+    
+        .trpi_wrapper_meta {
+            margin: 12px 0;
+            text-align: center;
+            p{
+                margin-bottom: 0;
+            }
+        }
+        .trpi_star_valid {
+            position: absolute;
+            height: 100%;
+            background: url(data:image/svg+xml;base64,PHN2Zw0KCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwOC45IiBoZWlnaHQ9IjEwMy42IiB2aWV3Qm94PSIwIDAgMTA4LjkgMTAzLjYiPg0KCTxkZWZzPg0KCQk8c3R5bGU+LmNscy0xe2ZpbGw6I2YxYzk0Nzt9PC9zdHlsZT4NCgk8L2RlZnM+DQoJPHRpdGxlPnN0YXIxPC90aXRsZT4NCgk8ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIj4NCgkJPGcgaWQ9IkxheWVyXzEtMiIgZGF0YS1uYW1lPSJMYXllciAxIj4NCgkJCTxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI1NC40IDAgNzEuMyAzNC4xIDEwOC45IDM5LjYgODEuNyA2Ni4xIDg4LjEgMTAzLjYgNTQuNCA4NS45IDIwLjggMTAzLjYgMjcuMiA2Ni4xIDAgMzkuNiAzNy42IDM0LjEgNTQuNCAwIi8+DQoJCTwvZz4NCgk8L2c+DQo8L3N2Zz4NCg==);
+            background-repeat: repeat-x;
+            background-size: 20px;
+            left: 0;
+            top: 0;
+        }
+        
+        .trpi_wrapper_star {
+            position: relative;
+            display: inline-block;
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDguOSIgaGVpZ2h0PSIxMDMuNiIgdmlld0JveD0iMCAwIDEwOC45IDEwMy42Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UzZTZlNjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnN0YXJfMDwvdGl0bGU+PGcgaWQ9IkxheWVyXzIiIGRhdGEtbmFtZT0iTGF5ZXIgMiI+PGcgaWQ9IkxheWVyXzEtMiIgZGF0YS1uYW1lPSJMYXllciAxIj48cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMTA4LjkgMzkuNiA3MS4zIDM0LjEgNTQuNCAwIDM3LjYgMzQuMSAwIDM5LjYgMjcuMiA2Ni4xIDIwLjggMTAzLjYgNTQuNCA4NS45IDg4LjEgMTAzLjYgODEuNyA2Ni4xIDEwOC45IDM5LjYiLz48L2c+PC9nPjwvc3ZnPg0K);
+            background-position: 0 0;
+            background-repeat: repeat-x;
+            width: 100px;
+            height: 20px;
+            background-size: 20px;
+        }
+}
 
 
 .filter-section {
@@ -948,6 +1012,27 @@ a.trpi_logout_user_link {
     }
 }
 
+
+.trpi_search_buisiness {
+    display: flex;
+    align-items: center;
+    svg {
+        position: absolute;
+        left: 8px;
+    }
+    input {
+        background: none;
+        border: 1px solid #eeeeee8a;
+        border-radius: 4px;
+        color: #818198;
+        ::placeholder {
+            color: #cccccc7a;
+        }
+    }
+}
+
+
+
 #register_virify_step {
     .steps{
         background: #fff;
@@ -1143,6 +1228,97 @@ $bolb-color: #fff;
             }
         }
     }
+    svg {
+        display: none;
+    }
+}
+
+
+.trpi_loading_dark {
+
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 99;
+
+    .backdrop {
+        background: rgb(168, 168, 168);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100vh;
+    }
+
+    .loading {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translate(0, -50%);
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        p{
+            color: #fff;
+        }
+    }
+
+    // Loader
+    .blobs {
+        filter: url(#goo);
+        width: 300px;
+        height: 110px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 70px;
+        transform-style: preserve-3d;
+
+        // Blob center item
+        .blob-center {
+            transform-style: preserve-3d;
+            position: absolute;
+            background: $bolb-color;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            transform-origin: left top;
+            transform: scale(.9) translate(-50%, -50%);
+            animation: blob-grow linear 3.4s infinite;
+            border-radius: 50%;
+            box-shadow: 0 -10px 40px -5px $bolb-color;
+        }
+    }
+
+    // Blob item
+    .blob {
+        position: absolute;
+        background: $bolb-color;
+        top: 50%;
+        left: 50%;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        animation: blobs ease-out 3.4s infinite;
+        transform: scale(.9) translate(-50%, -50%);
+        transform-origin: center top;
+        opacity: 0;
+
+        // Set animation delay for each of type
+        @for $i from 1 to 6 {
+            &:nth-child(#{$i}) {
+                animation-delay: $i * 0.2 + s;
+            }
+        }
+    }
+
     svg {
         display: none;
     }

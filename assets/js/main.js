@@ -3,6 +3,7 @@ const Swal = require('sweetalert2');
 
 var domtoimage = require('dom-to-image');
 var validator = require('validator');
+var html2canvas = require('html2canvas');
 
 import { saveAs } from 'file-saver';
 import isEmail from 'validator/lib/isEmail';
@@ -30,6 +31,26 @@ jQuery(document).ready(function($){
           BizFixRater.disable();
         });
   }
+
+
+  // $(document).on("keyup", ".trpi_search_buisiness input", debounce(function () {
+  //   var search = $(".trpi_search_buisiness input").val();
+  //   var url = new URL(TRPI_DATA.home_url + '/search-business');
+  //   url.searchParams.set("q", search);
+  //   show_loading();
+  //   window.location = url;
+  // } , 4000));
+
+  $(document).on( "keyup" , ".trpi_search_buisiness input", function (event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') {
+      var search = $(".trpi_search_buisiness input").val();
+      var url = new URL(TRPI_DATA.home_url + '/search-business');
+      url.searchParams.set("search", search);
+      show_loading();
+      window.location = url;
+    }
+  });
   
 
   $(document).on("click", "#apply_city_filter", function () {
@@ -103,6 +124,46 @@ jQuery(document).ready(function($){
               </div>`
     )
   }
+
+  function show_loading_dark() {
+    $('body').append(
+          `<!-- Loader -->
+              <div class="trpi_loading_dark">
+              
+              <div class="backdrop"></div>
+
+                <div class="loading">
+                    <div class="blobs">
+                      <div class="blob-center"></div>
+                      <div class="blob"></div>
+                      <div class="blob"></div>
+                      <div class="blob"></div>
+                      <div class="blob"></div>
+                      <div class="blob"></div>
+                      <div class="blob"></div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                      <defs>
+                        <filter id="goo">
+                          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+                          <feBlend in="SourceGraphic" in2="goo" />
+                        </filter>
+                      </defs>
+                    </svg>
+
+                    <p>در حال بررسی</p>
+                </div> 
+                
+                
+                
+              </div>`
+    )
+  }
+  function hide_loading_dark() {
+    $(".trpi_loading_dark").remove();
+  }
+
 
 
   $(document).on("click", "#register_business", function () {
@@ -861,68 +922,108 @@ jQuery(document).ready(function($){
         return;
       }
 
-      var fansy_review_thumb = $(this).closest('body').find(".fansy_review_thumb");
-      fansy_review_thumb.find(".review-title").text(title);
-      fansy_review_thumb.find(".review-content").text(trpiWordTrim(content , 400 , '...'));
-      fansy_review_thumb.find(".buisiness_star_rating_for_image").data('rating' , 3);
-      $.each($(".buisiness_star_rating_for_image"), function (i, v) {
-        var BizFixRater = rater({
-          element: v,
-          step: 1,
-          starSize: 35,
-        });
-        BizFixRater.disable();
-      });
+      show_loading_dark();
 
-      // ساخت تصویر برای تجربه...
-
-      var node = document.getElementById("fansy_review_thumb");
-      
-      $('body').append(fansy_review_thumb)
-      // fansy_review_thumb.insertAfter($('main'))
-      fansy_review_thumb.show();
-
-      domtoimage.toJpeg(node)
-        .then(function (dataImage) {
-          fansy_review_thumb.hide();
-
-          $.ajax({
-            url: wrapper.data("ajax"),
-            dataType: 'json',
-            type: 'post',
-            catch : false,
-            data: {
-              action: 'trpi_submit_form_review',
-              star,
-              post_id,
-              content,
-              title,
-              nonce,
-              dataImage 
-            },
-            success: function (response) {
-              if (response === true) {
-                  
-                  Toast.fire({ icon: 'success', title: 'تجربه شما با موفقیت ثبت شد!' });
-                  wrapper.find(".content-field textarea").val("");
-                  wrapper.find(".title-field input").val("");
-                  wrapper.find(".condition-field input").prop('checked', false);
-                  wrapper.find(".buisiness_user_star_rating").data("star" , 0);
-                  BizUserRater.setRating(0);
-
-                } else {
-                    Toast.fire({ icon: 'error', title: response });
-                }
+      $.ajax({
+        url: wrapper.data("ajax"),
+        dataType: 'json',
+        type: 'post',
+        catch : false,
+        data: {
+          action: 'trpi_submit_form_review',
+          star,
+          post_id,
+          content,
+          title,
+          nonce,
+          // dataImage 
+        },
+        success: function (response) {
+            if (response.success) {
+                wrapper.find(".content-field textarea").val("");
+                wrapper.find(".title-field input").val("");
+                wrapper.find(".condition-field input").prop('checked', false);
+                wrapper.find(".buisiness_user_star_rating").data("star" , 0);
+                BizUserRater.setRating(0);
+                update_badge_company(response.data , title , content , star);
+            } else {
+                  Toast.fire({ icon: 'error', title: response.data });
             }
-          });
-
-      })
-      
+          }
+      });
 
       
     });
   
   
+  function update_badge_company(data) {
+
+    var node = document.getElementById("fansy_review_thumb");
+    var node2 = document.getElementById("company_badge_box");
+    $(".trpi_badge_holder").show();
+    var company_badge_box = $("#company_badge_box");
+    company_badge_box.find(".trpi_star_valid").css("width" , data.width + '%');
+    company_badge_box.find(".level").text(data.level);
+    company_badge_box.find(".total").text(data.total);
+
+
+    var fansy_review_thumb = $(".fansy_review_thumb");
+    fansy_review_thumb.find(".review-title").text(data.title);
+    fansy_review_thumb.find(".review-content").text(trpiWordTrim(data.content , 400 , '...'));
+    fansy_review_thumb.find(".trpi_star_valid").css('width', (data.rating / 5) * 100 + '%');
+
+    $('body').append(fansy_review_thumb);
+    $('body').append(company_badge_box);
+    fansy_review_thumb.show();
+  
+    html2canvas(node2, {
+      allowTaint: true,
+      useCORS: true,
+      scale: 1,
+      backgroundColor : '#000032' ,
+    }).then(function (canvas2) {
+      var badge_img = canvas2.toDataURL();
+
+      html2canvas(node, {
+        allowTaint: true,
+        useCORS: true,
+        scale: 1,
+      }).then(function (canvas) {
+        var review_img = canvas.toDataURL();
+
+        $.ajax({
+          url: TRPI_DATA.ajax_url,
+          dataType: 'json',
+          type: 'post',
+          catch : false,
+          data: {
+            action: 'trpi_update_badge_and_image_review',
+            post_id : data.post_id,
+            review_id : data.review_id,
+            review_img,
+            badge_img
+          },
+          success: function (response) {
+            fansy_review_thumb.hide();
+            company_badge_box.hide();
+            hide_loading_dark();
+            if (response.success) {
+              Toast.fire({ icon: 'success', title: 'تجربه شما با موفقیت ثبت شد!' });
+              window.location = TRPI_DATA.home_url + '?p=' + data.post_id;
+              } else {
+                  Toast.fire({ icon: 'error', title: response.data });
+              }
+            }
+        });
+        // fansy_review_thumb.hide();
+      });
+  
+    });
+
+
+  }
+  
+    
   function trpiWordTrim(value, length, overflowSuffix) {
     if (value.length <= length) return value;
     var strAry = value.split(' ');

@@ -19,3 +19,5 @@ include_once TRUST_PILOT_PATH . "template/shortcodes/login.php";
 include_once TRUST_PILOT_PATH . "template/shortcodes/register.php";
 include_once TRUST_PILOT_PATH . "template/shortcodes/forgot-password.php";
 include_once TRUST_PILOT_PATH . "template/shortcodes/reset-password.php";
+include_once TRUST_PILOT_PATH . "template/shortcodes/serach-input.php";
+include_once TRUST_PILOT_PATH . "template/shortcodes/search-results.php";
