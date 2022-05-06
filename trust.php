@@ -3,102 +3,84 @@
 Plugin Name: trust pilot
 Plugin URI: http://mohammadiani.com
 Author: یوسف محمدیانی
-Version: 1.0.0
+Version: 1.1.0
 Text Domain: trust pilot
 Domain Path: /languages
 Author URI: http://mohammadiani.com
 */
 
-//in yek update baraye check kardane
-
 if(!defined("TRUST_PILOT_PATH")) define("TRUST_PILOT_PATH",plugin_dir_path(__FILE__));
 if(!defined("TRUST_PILOT_URL")) define("TRUST_PILOT_URL",plugin_dir_url(__FILE__));
 if(!defined("TRUST_PILOT_DB_VER")) define("TRUST_PILOT_DB_VER","1.0.1");
-if(!defined("TRUST_PILOT_ASSETS_VER")) define("TRUST_PILOT_ASSETS_VER","9.8.0");
+if(!defined("TRUST_PILOT_ASSETS_VER")) define("TRUST_PILOT_ASSETS_VER","12.8.0");
 if(!defined("TRUST_PILOT_PREFIX")) define("TRUST_PILOT_PREFIX","trpi_");
 
-use TrustPilot\htmlToJpeg;
 use TrustPilot\init;
+
+
+add_action("init" , function(){
+            add_rewrite_rule(
+        'reviews/([0-9]+)/?$',
+        'index.php?pagename=reviews&review_id=$matches[1]',
+        'top' );
+} , 10 , 1);
 
 require_once __DIR__ . '/vendor/autoload.php';
 new init;
 
 
-add_action('init',function(){
-        add_rewrite_rule(
-        'reviews/([0-9]+)/?$',
-        'index.php?pagename=reviews&review_id=$matches[1]',
-        'top' );
-});
 
-add_action( 'wp_head', 'wpse26388_rewrites_init' , 5 );
-function wpse26388_rewrites_init(){
-
-
-    $uri = $_SERVER['REQUEST_URI'];
-    $dir = explode('/',strtok($uri,'?'));
-    if($dir[1]=='reviews' && count($dir) >= 3):
-        $code = $dir[2];
-        $comment = get_comment($code);
-        if(!isset($comment)){
-            return;
-        }
-        $title = get_comment_meta($comment->comment_ID , 'title' , true);
-        $image = wp_get_upload_dir()['baseurl'] . '/reviews/' . $comment->comment_post_ID . '/' .$comment->comment_ID . '.jpg';
-
-        $description = strlen($comment->comment_content) > 100 ? substr($comment->comment_content, 0, 100) . "..."  : $comment->comment_content;
-
-        ?>
-            <meta property='og:title' content='<?php echo $title ?>'/>
-            <meta property='og:image' content='<?php echo $image ?>'/>
-            <meta property='og:description' content='<?php echo $description; ?>'/>
-            <meta property='og:url' content='<?php echo home_url('reviews/' . $comment->comment_ID ) ?>'/>
-            <meta property='og:image:width' content='600' />
-            <meta property='og:image:height' content='600' />
-            <meta property="og:type" content='article'/>
-        <?php
-    
-    endif;
-
+// Add term page
+function pippin_taxonomy_add_new_meta_field() {
+	// this will add the custom meta field to the add new term page
+	?>
+	<div class="form-field">
+		<label for="term_meta[term_icon]">آیکون دسته بندی</label>
+		<input type="text" name="term_meta[term_icon]" id="term_meta[term_icon]" value="">
+		<p class="description">نام کلاس آیکون</p>
+	</div>
+<?php
 }
+add_action( 'categories_add_form_fields', 'pippin_taxonomy_add_new_meta_field', 10, 2 );
 
 
-function my_logged_in_redirect() {
-    $uri = $_SERVER['REQUEST_URI'];
-    $dir = explode('/',strtok($uri,'?'));
-    if( !is_user_logged_in() && $dir[1]=='add-review' ){
-        $return_url = home_url($_SERVER['REQUEST_URI']);
-        setcookie("trpi_return_url" , $return_url , time() + 1200 , '/');
-        wp_redirect(home_url('login'));
-        exit;
-    }
-    if( is_user_logged_in() && isset($_COOKIE['trpi_return_url']) ){
 
-        $user_id = get_current_user_id();
-        $state = get_post_meta($user_id , "user-state" , true);
-
-        if($state == "completed"){
-            setcookie("trpi_return_url" , "" , time() - 10 , '/');
-            wp_redirect($_COOKIE['trpi_return_url']);
-            exit;
-        }
-
-    }
-     
+// Edit term page
+function pippin_taxonomy_edit_meta_field($term) {
+ 
+	// put the term ID into a variable
+	$t_id = $term->term_id;
+ 
+	// retrieve the existing value(s) for this meta field. This returns an array
+	$term_meta = get_option( "taxonomy_$t_id" ); ?>
+	<tr class="form-field">
+	<th scope="row" valign="top"><label for="term_meta[term_icon]">آیکون دسته بندی</label></th>
+		<td>
+			<input type="text" name="term_meta[term_icon]" id="term_meta[term_icon]" value="<?php echo esc_attr( $term_meta['term_icon'] ) ? esc_attr( $term_meta['term_icon'] ) : ''; ?>">
+            <p class="description">نام کلاس آیکون</p>
+		</td>
+	</tr>
+<?php
 }
-add_action( 'template_redirect', 'my_logged_in_redirect' );
-
-add_filter( 'query_vars', 'wpse26388_query_vars' );
-function wpse26388_query_vars( $query_vars ){
-    $query_vars[] = 'review_id';
-    return $query_vars;
-}
+add_action( 'categories_edit_form_fields', 'pippin_taxonomy_edit_meta_field', 10, 2 );
 
 
-add_action("init", function(){
-    if(!current_user_can( 'manage_options' )){
-        add_filter( 'show_admin_bar', '__return_false' );
-    }
 
 
-});
+// Save extra taxonomy fields callback function.
+function save_taxonomy_custom_meta( $term_id ) {
+	if ( isset( $_POST['term_meta'] ) ) {
+		$t_id = $term_id;
+		$term_meta = get_option( "taxonomy_$t_id" );
+		$cat_keys = array_keys( $_POST['term_meta'] );
+		foreach ( $cat_keys as $key ) {
+			if ( isset ( $_POST['term_meta'][$key] ) ) {
+				$term_meta[$key] = $_POST['term_meta'][$key];
+			}
+		}
+		// Save the option array.
+		update_option( "taxonomy_$t_id", $term_meta );
+	}
+}  
+add_action( 'edited_categories', 'save_taxonomy_custom_meta', 10, 2 );  
+add_action( 'create_categories', 'save_taxonomy_custom_meta', 10, 2 );

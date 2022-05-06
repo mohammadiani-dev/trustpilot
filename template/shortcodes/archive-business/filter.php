@@ -17,7 +17,7 @@ function trpi_filter_side_bar_shortcode(){
         <div class="filter-widget filter-city">
             <label>
                 <h5>موقعیت کسب و کار</h5>
-                <input placeholder="مثلا تهران" >
+                <input placeholder="مثلا تهران" value="<?php echo isset($_GET['city']) ? $_GET['city'] : '' ?>" >
             </label>
             <button id="apply_city_filter">اعمال</button>
         </div>
@@ -52,19 +52,19 @@ function trpi_filter_side_bar_shortcode(){
             <h5>بازه زمانی</h5>
             <div>
                 <label>
-                    <input type="radio" name="time_period" value="0">
+                    <input type="radio" name="time_period" value="0" <?php echo !isset($_GET['period']) ? 'checked' : '' ?> >
                     <span>از ابتدا</span>
                 </label>
                 <label>
-                    <input type="radio" name="time_period"  value="180" checked>
+                    <input type="radio" name="time_period"  value="180" <?php echo isset($_GET['period']) && $_GET['period'] ==  '180' ? 'checked' : '' ?> >
                     <span>6 ماه پیش</span>
                 </label>
                 <label>
-                    <input type="radio" name="time_period"  value="365">
+                    <input type="radio" name="time_period"  value="365" <?php echo isset($_GET['period']) && $_GET['period'] ==  '365' ? 'checked' : '' ?>>
                     <span>12 ماه پیش</span>
                 </label>
                 <label>
-                    <input type="radio" name="time_period"  value="540">
+                    <input type="radio" name="time_period"  value="540" <?php echo isset($_GET['period']) && $_GET['period'] ==  '540' ? 'checked' : '' ?>>
                     <span>18 ماه پیش</span>
                 </label>
             </div>

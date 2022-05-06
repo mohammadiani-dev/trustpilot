@@ -93,7 +93,7 @@ function trpi_add_form_section_shortcode(){
     <div class="trpi_badge_holder">
         <div id='company_badge_box' >
             <div class="trpi_wrapper_logo">
-                <img width="150" src="<?php echo TRUST_PILOT_URL.'/assets/images/logo.png' ?>">
+                <img width="150" src="<?php echo TRUST_PILOT_URL.'/assets/images/logo-normal.png' ?>">
             </div>
             <div class="trpi_wrapper_star">
                 <div class="trpi_star_valid"></div>
@@ -104,7 +104,7 @@ function trpi_add_form_section_shortcode(){
             </div>
         </div> 
     </div>
-    
+      
 
 
     <?php

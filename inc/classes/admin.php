@@ -12,8 +12,39 @@ class admin{
         add_action('admin_menu', [$this,'add_menu_page']);
         add_action('add_meta_boxes', [$this,'add_meta_boxes']);
         add_action('save_post', [$this,'save_post'],10,2);   
+        add_filter('manage_review_flags_posts_columns', array($this,'review_flags_columns'));
+        add_action('manage_review_flags_posts_custom_column', array($this,'review_flags_columns_content'), 10, 2);
     }
 
+    public function review_flags_columns($columns)
+    {
+        unset($columns['date']);
+        unset($columns['title']);
+        $columns['title'] = 'نوع گزارش';
+        // $columns['user'] = 'کاربر';
+        $columns['business'] = 'در کسب و کار';
+        $columns['review'] = 'تجربه گزارش شده';
+        $columns['date'] = 'تاریخ ایجاد';
+        return $columns;
+    }
+
+    public function review_flags_columns_content($column , $post_id){
+        $review_id = get_post_meta($post_id , "trpi_review_id" , true);
+        $business_id = get_post_meta($post_id , "trpi_business_id" , true);
+        $data = get_post_meta($post_id, AVANS_PREFIX.'gift_settings', true);
+        switch ($column) {
+            case 'business':
+                ?>
+                    <a href="<?php echo get_the_permalink($business_id); ?>" target="_blank"><?php echo get_the_title($business_id); ?></a>
+                <?php
+            break;
+            case 'review':
+                ?>
+                    <a href="<?php echo admin_url("comment.php?action=editcomment&c=" . $review_id); ?>" target="_blank">مشاهده تجربه</a>
+                <?php
+            break;
+        }
+    }
 
 
     public function register_custom_roles_and_caps(){
@@ -148,12 +179,33 @@ class admin{
         
     }
 
-    public function metabox_data_business_content(){
+    public function metabox_data_business_content($post){
         include TRUST_PILOT_PATH . 'template/admin/metaboxes/data_business.php';
     }
 
-    public function save_post(){
+    public function save_post($post_id){
         
+        if(get_post_type($post_id) == "business"){
+            if(isset($_POST['domein'])){
+                update_post_meta($post_id ,TRUST_PILOT_PREFIX."domein" , sanitize_text_field($_POST['domein']) );
+            }
+            if(isset($_POST['city'])){
+                update_post_meta($post_id ,TRUST_PILOT_PREFIX."city" , sanitize_text_field($_POST['city']) );
+            }    
+            if(isset($_POST['state'])){
+                update_post_meta($post_id ,TRUST_PILOT_PREFIX."state" , sanitize_text_field($_POST['state']) );
+            }    
+            if(isset($_POST['phone']) || isset($_POST['address']) || isset($_POST['email'])){
+                $other_data = (array)get_post_meta($post_id ,TRUST_PILOT_PREFIX."other-data" ,true );
+                $other_data['phone'] = sanitize_text_field($_POST['phone']);
+                $other_data['address'] = sanitize_text_field($_POST['address']);
+                $other_data['email'] = sanitize_text_field($_POST['email']);
+                update_post_meta($post_id ,TRUST_PILOT_PREFIX."other-data" , $other_data );
+            } 
+         
+        }
+
+
     }
 
 

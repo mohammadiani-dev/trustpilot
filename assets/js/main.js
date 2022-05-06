@@ -1,12 +1,12 @@
+require("./owl.carousel.min.js");
+
 var rater = require('rater-js');
 const Swal = require('sweetalert2');
-
-var domtoimage = require('dom-to-image');
 var validator = require('validator');
 var html2canvas = require('html2canvas');
-
 import { saveAs } from 'file-saver';
-import isEmail from 'validator/lib/isEmail';
+import Cookies from 'js-cookie';
+
 
 
 
@@ -21,25 +21,32 @@ const Toast = Swal.mixin({
 
 jQuery(document).ready(function($){
 
-    if (document.querySelector(".buisiness_star_rating") !== null) {
-        $.each($(".buisiness_star_rating"), function (i, v) {
-          var BizFixRater = rater({
-            element: v,
-            step: 1,
-            starSize: 25,
-          });
-          BizFixRater.disable();
-        });
-  }
+  $('.trpi_category_carousel').owlCarousel({
+      loop:true,
+      margin: 10,
+      nav: true,
+      rtl:true,
+      responsiveClass:true,
+      responsive:{
+          0:{
+              items:1,
+              nav:true
+          },
+          600:{
+              items:3,
+              nav:false
+          },
+          1000:{
+              items:4,
+              nav:true,
+              loop:false
+          }
+      }
+  })
 
+  
+  trpi_load_star_rates();
 
-  // $(document).on("keyup", ".trpi_search_buisiness input", debounce(function () {
-  //   var search = $(".trpi_search_buisiness input").val();
-  //   var url = new URL(TRPI_DATA.home_url + '/search-business');
-  //   url.searchParams.set("q", search);
-  //   show_loading();
-  //   window.location = url;
-  // } , 4000));
 
   $(document).on( "keyup" , ".trpi_search_buisiness input", function (event) {
     var keycode = (event.keyCode ? event.keyCode : event.which);
@@ -191,6 +198,9 @@ jQuery(document).ready(function($){
       return Toast.fire({ icon: "error", title: "رمزعبور وارد نشده است!" });
     }
 
+    var btn = $(this);
+    btn_start_procces(btn);
+
     $.ajax({
       url: TRPI_DATA.ajax_url,
       dataType: 'json',
@@ -200,6 +210,7 @@ jQuery(document).ready(function($){
         name, email, domein, password
       },
       success: function (response) {
+        btn_end_procces(btn);
         if (response) {
           Toast.fire({ icon: "success", title: "ثبت نام شما با موفقیت انجام شد!" });
 
@@ -229,6 +240,9 @@ jQuery(document).ready(function($){
       return Toast.fire({icon:"error" , title:"کد اعتبار سنجی ایمیل به درستی وارد نشده است!"})
     }
 
+    var btn = $(this);
+    btn_start_procces(btn);
+
     $.ajax({
       url: TRPI_DATA.ajax_url,
       type: "post",
@@ -237,7 +251,7 @@ jQuery(document).ready(function($){
         action: "trpi_verify_business",
         otp
       }, success: function (response) {
-
+        btn_end_procces(btn);
         if (response.success === true) {
           Toast.fire({ icon: 'success', title: response.data });
 
@@ -251,6 +265,7 @@ jQuery(document).ready(function($){
 
       },
       error: function (error) {
+        btn_end_procces(btn);
         console.log(error);
       }
     });
@@ -317,6 +332,9 @@ jQuery(document).ready(function($){
 
     form_data.append("action", "trpi_complete_data_business");
 
+    var btn = $(this);
+    btn_start_procces(btn);
+
     $.ajax({
       url: TRPI_DATA.ajax_url,
       dataType: "json",
@@ -326,6 +344,7 @@ jQuery(document).ready(function($){
       data: form_data,
       type: "post",
       success: function (response) {
+        btn_end_procces(btn);
         if (response.success) {
             show_loading();
             location.reload();
@@ -335,6 +354,7 @@ jQuery(document).ready(function($){
         }
       },
       error: function (response) {
+          btn_end_procces(btn);
           Toast.fire({ icon: "error", title: "ذخیره اطلاعات با خطا مواجه شد!" });
       },
     });
@@ -354,6 +374,9 @@ jQuery(document).ready(function($){
       return Toast.fire({ icon: "error", title : "رمز عبور وارد نشده است!" });
     }
 
+    var btn = $(this);
+    btn_start_procces(btn);
+
     $.ajax({
       url: TRPI_DATA.ajax_url,
       dataType: 'json',
@@ -364,6 +387,7 @@ jQuery(document).ready(function($){
         password
       },
       success: function (response) {
+        btn_end_procces(btn);
         if (response.success) {
           Toast.fire({ icon: "success", title: response.data });
           show_loading();
@@ -373,6 +397,7 @@ jQuery(document).ready(function($){
         }
       },
       error: function (error) {
+        btn_end_procces(btn);
         console.log(error);
       }
     });
@@ -407,7 +432,8 @@ jQuery(document).ready(function($){
       return Toast.fire({ icon: "error", title : "رمز عبور وارد شده ضعیف است!" });
     }
 
-    
+    var btn = $(this);
+    btn_start_procces(btn);
     $.ajax({
       url: TRPI_DATA.ajax_url,
       dataType: 'json',
@@ -419,6 +445,7 @@ jQuery(document).ready(function($){
         fullname
       },
       success: function (response) {
+        btn_end_procces(btn);
         if (response.success) {
           Toast.fire({ icon: "success", title: response.data });
           show_loading();
@@ -428,6 +455,7 @@ jQuery(document).ready(function($){
         }
       },
       error: function (error) {
+        btn_end_procces(btn);
         console.log(error);
       }
     });
@@ -443,6 +471,9 @@ jQuery(document).ready(function($){
       return Toast.fire({icon:"error" , title:"کد اعتبار سنجی ایمیل به درستی وارد نشده است!"})
     }
 
+    var btn = $(this);
+    btn_start_procces(btn);
+
     $.ajax({
       url: TRPI_DATA.ajax_url,
       type: "post",
@@ -451,6 +482,7 @@ jQuery(document).ready(function($){
         action: "trpi_verify_account",
         otp
       }, success: function (response) {
+        btn_end_procces(btn);
 
         if (response.success === true) {
           Toast.fire({ icon: 'success', title: response.data });
@@ -465,6 +497,7 @@ jQuery(document).ready(function($){
 
       },
       error: function (error) {
+        btn_end_procces(btn);
         console.log(error);
       }
     });
@@ -682,7 +715,9 @@ jQuery(document).ready(function($){
     var review_id = $(this).data("review-id");
     var post_id = $(".trpi_review_item").data("post-id");
     
-  
+    var btn = $(this);
+    btn_start_procces(btn);
+
     $.ajax({
       url: TRPI_DATA.ajax_url,
       dataType: 'json',
@@ -692,7 +727,9 @@ jQuery(document).ready(function($){
         content,
         review_id,
         post_id
-      },
+      }, success: function (response) {
+        btn_end_procces(btn);
+      }
       
     });
     
@@ -706,7 +743,7 @@ jQuery(document).ready(function($){
     var review_id = $(this).data("review-id");
     var business_id = $(".trpi_review_item").data("post-id");
 
-    btn.text("در حال بررسی...");
+    btn_start_procces(btn);
 
     $.ajax({
       url: TRPI_DATA.ajax_url,
@@ -719,6 +756,7 @@ jQuery(document).ready(function($){
         business_id
       },
       success: function (response) {
+        btn_end_procces(btn);
         if (response > 0) {
           $(".trpi_wrapper_popup").hide();
           Toast.fire({ icon: "success", title: "گزارش شما برای مدیریت ارسال شد." });
@@ -828,6 +866,27 @@ jQuery(document).ready(function($){
 
     }); 
   
+  $(document).on("click", "#open_popup_embed_code", function () {
+    var id = $(this).data('id');
+
+
+    var title = document.title;
+    var rand = Math.random() * 1000000;
+
+    var current_url = new URL(TRPI_DATA.home_url);
+    current_url.searchParams.set("id", id);
+
+    var html = `
+      <div class="trpi_desc_embed_code_wrapper">
+        <img src="${TRPI_DATA.home_url}/wp-content/uploads/business/${id}/badge.jpg?${rand}" alt="">
+        <p>لطفا کد زیر را در قسمت دلخواه از سایت قرار دهید تا تصویر نشان در سایتان نمایش داده شود و کاربران سایتتان با کلیک بر روی آن به این صفحه هدایت شوند تا تجربیات مشتریانتان را ببینند یا تجربه جدید اضافه کنند.<p>
+        <textarea class="trpi_embed_code_holder"><a href="${current_url}" target="_blank"><img src="${TRPI_DATA.home_url}/wp-content/uploads/business/${id}/badge.jpg" alt=""></a></textarea>
+      </div>
+    `;
+
+    trpi_open_popup("دریافت کد نشان شرکت" , html);
+  });
+  
   $(document).on("click", ".link_warapper input", function () {
       trpi_copy_text($(this).val());
     });
@@ -924,6 +983,9 @@ jQuery(document).ready(function($){
 
       show_loading_dark();
 
+      var btn = $(this);
+      btn_start_procces(btn);
+
       $.ajax({
         url: wrapper.data("ajax"),
         dataType: 'json',
@@ -939,6 +1001,7 @@ jQuery(document).ready(function($){
           // dataImage 
         },
         success: function (response) {
+            btn_end_procces(btn);
             if (response.success) {
                 wrapper.find(".content-field textarea").val("");
                 wrapper.find(".title-field input").val("");
@@ -980,7 +1043,7 @@ jQuery(document).ready(function($){
       allowTaint: true,
       useCORS: true,
       scale: 1,
-      backgroundColor : '#000032' ,
+      backgroundColor : '#fff' ,
     }).then(function (canvas2) {
       var badge_img = canvas2.toDataURL();
 
@@ -1072,6 +1135,7 @@ jQuery(document).ready(function($){
               },
               success: function (response) {
                 $(".trpi_review_item").html(response);
+                trpi_load_star_rates();
                 trpi_scroll_to_element($(".trpi_review_item"));
                 hide_loading();
               },
@@ -1098,6 +1162,33 @@ jQuery(document).ready(function($){
                 }
             });
             return list.join(',');
-      }
+  }
+
+
+  function btn_start_procces(btn, title) {
+    Cookies.set("trpi_btn_title", btn.text());
+    btn.text(title !== undefined ? title : "در حال بررسی...");
+    btn.attr("disabled", true);
+  }
+
+  function btn_end_procces(btn) {
+    var title = Cookies.get("trpi_btn_title");
+    btn.text(title !== undefined ? title : "کلیک کنید");
+    btn.attr("disabled", false);
+    Cookies.remove("trpi_btn_title");
+  }
+
+  function trpi_load_star_rates() {
+    if (document.querySelector(".buisiness_star_rating") !== null) {
+          $.each($(".buisiness_star_rating"), function (i, v) {
+            var BizFixRater = rater({
+              element: v,
+              step: 1,
+              starSize: 25,
+            });
+            BizFixRater.disable();
+          });
+    }
+  }
 
 });

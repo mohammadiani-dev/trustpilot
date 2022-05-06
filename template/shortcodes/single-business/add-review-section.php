@@ -17,7 +17,7 @@ function trpi_add_review_section_shortcode(){
                         echo "<strong>$fullname</strong>";
                     }
                 ?>
-                <a id="trpi_add_new_review_button"  target="_blank" href="<?php echo add_query_arg(['post_id' => get_the_ID() ] , home_url('add-review') ) ?>">یک نقد جدید اضافه کن</a>
+                <a id="trpi_add_new_review_button"  target="_blank" href="<?php echo add_query_arg(['post_id' => get_the_ID() ] , home_url('add-review') ) ?>">یک تجربه جدید اضافه کن</a>
             </div>
         </div>
 

@@ -12,10 +12,16 @@ function trpi_reviews_list_shortcode(){
     ?>
     <div class="trpi_review_item" data-post="<?php echo $title; ?>" data-post-id="<?php echo get_the_ID(); ?>">
         <?php
+        global $post;
+        $author_id = (int)$post->post_author;
+        $current_user_id = get_current_user_id();
+
+        $can_reply = $author_id == $current_user_id ? true : false;
+
         foreach($data['result'] as $item){
-            include __DIR__ . '/../widgets/review-item.php';
+            include __DIR__ . '/../../widgets/review-card.php';
         }
-        include __DIR__ . '/../widgets/pagination.php';
+        include __DIR__ . '/../../widgets/pagination.php';
         ?>
     </div>
     <?php

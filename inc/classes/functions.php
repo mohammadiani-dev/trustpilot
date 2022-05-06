@@ -36,19 +36,26 @@ class functions{
         }
         return $ip;
     }
+    
+    public static function send_one(){
+        return 1;
+    }
 
     public static function send_email($data, $type){
         ob_start();
-
+        
         include TRUST_PILOT_PATH . "template/email/${type}.php";
         $html=ob_get_contents();
         ob_end_clean();
+        
+        
+        $data['site_name'] = 'بهترین';
 
         foreach ($data as $index=>$var) {
             $html =  str_replace('{'.$index.'}', $var, $html);
         }
 
-        $emailsite = get_bloginfo('admin_email');
+        $emailsite = 'site@behtarin.company';
         $site_name = get_bloginfo('name');
 
         $headers  = "From: $site_name < $emailsite >\n";
@@ -60,7 +67,7 @@ class functions{
 
         $result = wp_mail($data['email'], $data['title'], $html, $headers);
 
-        return $result;
+        // return $result;
     }
 
 

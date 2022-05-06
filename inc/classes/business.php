@@ -23,6 +23,81 @@ class business{
     public function get_meta($meta_key){
         return get_post_meta($this->post_id ,TRUST_PILOT_PREFIX .  $meta_key , true);
     }
+
+    public static function get_business_by_review_id($review_id){
+        global $wpdb;
+        $table_log = $wpdb->prefix.'comments';
+        $row = $wpdb->get_row("SELECT comment_post_ID FROM $table_log WHERE comment_ID = '$review_id'");
+        if(is_object($row)){
+            return $row->comment_post_ID;
+        }
+        return false;
+    }
+
+    public static function get_review($review_id){
+
+        global $wpdb;
+
+        $table_log = $wpdb->prefix.'comments';
+        $table_meta = $wpdb->prefix.'commentmeta';
+
+        $sql = "";
+        $where = " WHERE ";
+        $where_clauses = [];
+        
+
+        $query = " comment_ID = '$review_id' ";
+        array_push($where_clauses, $query);
+
+        $query = " comment_type = 'trpi_review' ";
+        array_push($where_clauses, $query);
+
+        $query = " comment_approved = '1' ";
+        array_push($where_clauses, $query);
+
+
+
+        if (count($where_clauses) > 0) {
+            foreach ($where_clauses as $index => $where_clause) {
+                if ($index>0) {
+                    $where .= 'AND'.$where_clause;
+                } else {
+                    $where .= $where_clause;
+                }
+            }
+        }
+
+        $query = "SELECT * FROM {$table_log} $where";
+
+        $results  = $wpdb->get_results($query.$sql);
+
+
+        $ids = [];
+
+        $resFinal = [];
+        foreach($results as $res){
+            $ids[] = $res->comment_ID;
+            $resFinal[$res->comment_ID] = $res;
+        }
+
+        if(count($results) > 0){
+            $imploaded_ids = implode(",",$ids);
+            $query2 = "SELECT * FROM {$table_meta} WHERE comment_id IN ($imploaded_ids) ";
+            $results2 = $wpdb->get_results($query2);
+            foreach($results2 as $res){
+                $resFinal[$res->comment_id]->user_review_count = user::get_reviews_count($resFinal[$res->comment_id]->user_id) ;
+                $resFinal[$res->comment_id]->{'comment_' . $res->meta_key} = $res->meta_value;
+            }
+        }
+
+        // $search = [
+        //     'query' => $query,
+        //     'result' => $resFinal,
+        // ];
+
+        return $resFinal[$review_id];
+
+    }
     
     public function get_reviews(array $args = array()){
 
@@ -130,6 +205,7 @@ class business{
             $query2 = "SELECT * FROM {$table_meta} WHERE comment_id IN ($imploaded_ids) ";
             $results2 = $wpdb->get_results($query2);
             foreach($results2 as $res){
+                $resFinal[$res->comment_id]->user_review_count = user::get_reviews_count($resFinal[$res->comment_id]->user_id) ;
                 $resFinal[$res->comment_id]->{'comment_' . $res->meta_key} = $res->meta_value;
             }
         }

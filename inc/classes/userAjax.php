@@ -1,7 +1,7 @@
 <?php namespace TrustPilot;
 
 use Avans\update;
-use functions;
+use TrustPilot\functions;
 use Google_Service_Oauth2;
 use WP_Error;
 
@@ -93,15 +93,25 @@ class userAjax{
 
     public function trpi_resend_otp_code_callback(){
 
-        $user_id = get_current_user_id();
+        $user = wp_get_current_user();
 
-        if($user_id == 0){
+        if($user->ID == 0){
             wp_send_json_error("کاربر معتبر نیست!");
         }
 
-        $verification_code = update_user_meta( $user_id, "verification_code" , rand(111111 , 999999));
+        $verification_code = rand(111111 , 999999);
+        update_user_meta( $user->ID, "verification_code" , $verification_code );
 
-        do_action("after_resend_otp_action" , $user_id , $verification_code);
+        $data = [
+            'display_name' => $user->display_name,
+            'email' => $user->user_email,
+            'title' => 'تایید ایمیل کاربری',
+            'verification_code' => $verification_code,
+        ];
+
+        functions::send_email($data , 'otp');
+
+        // do_action("after_resend_otp_action" , $user->user_email , $verification_code);
 
         wp_send_json_success();
     }
@@ -232,6 +242,15 @@ class userAjax{
             wp_send_json_error($user_id->get_error_message());
         }
         
+        $data = [
+            'display_name' => $fullname,
+            'email' => $meta['reviewer_email'],
+            'title' => 'تایید ایمیل کاربری',
+            'verification_code' => $meta['verification_code'],
+        ];
+
+        functions::send_email($data , 'otp');
+
         // do_action("after_register_business" , $user_id , $meta);
         wp_set_current_user($user_id);
         wp_set_auth_cookie($user_id, true);
@@ -324,6 +343,7 @@ class userAjax{
     public function trpi_complete_data_business_callback(){
 
         $user = wp_get_current_user();
+        
 
         $email = get_user_meta($user->ID , "company_email" , true);
         $domein = get_user_meta($user->ID , "company_domein" , true);        
@@ -367,8 +387,17 @@ class userAjax{
 
     public function trpi_submit_replay_review_callback(){
 
-
         $user = wp_get_current_user();
+
+        $post = get_post((int)sanitize_text_field( $_POST["post_id"] ));
+        $author_id = (int)$post->post_author;
+
+        $can_reply = $author_id == $user->ID ? true : false;
+
+        if(!$can_reply){
+            wp_send_json("شما اجازه پاسخ دادن به این تجربه را ندارید!"  , 403); 
+        }
+
 
         if(!$user){
             wp_send_json("login error"  , 403);
@@ -432,11 +461,24 @@ class userAjax{
 
         if(!is_wp_error($user_id)){
             // do_action("after_register_business" , $user_id , $meta);
+            
+            $data = [
+                'display_name' => $meta['company_name'],
+                'email' => $meta['company_email'],
+                'title' => 'تایید ایمیل کسب و کار',
+                'verification_code' => $meta['verification_code'],
+            ];
+
+            functions::send_email($data , 'otp');
+            
 
             wp_set_current_user($user_id);
             wp_set_auth_cookie($user_id, true);
+            
 
             update_user_meta($user_id , "user-state" , "waiting-otp");
+            
+         
 
             wp_send_json(md5($user_id));
         }
@@ -454,7 +496,7 @@ class userAjax{
         update_user_meta($user->ID , "verification" , true);
         update_user_meta($user->ID , "user-state" , "waiting-complete-info");
 
-        wp_send_json_success("اعتبارسنجی با موفقیت انجام شد.");
+        // wp_send_json_success("اعتبارسنجی با موفقیت انجام شد.");
 
         if(strlen($otp) !== 6){
             wp_send_json_error("کد تایید وارد شده فرمت نادرستی دارد!");
@@ -474,11 +516,16 @@ class userAjax{
         }
 
         $address = get_user_meta($user->ID , "company_domein" , true);
+        
+        $address = str_replace("https://" , "" , $address);
+        $address = str_replace("http://" , "" , $address);
+        $address = str_replace("www." , "" , $address);
 
 
-        $rFile = $address.md5($user->ID);
+        $rFile = 'http://'.$address.'/'.md5($user->ID).'.txt';
         $ch = curl_init($rFile);
         curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -505,7 +552,10 @@ class userAjax{
 
     public function trpi_submit_flag_reason_callback(){
 
+        $user = wp_get_current_user();
+
         $post = wp_insert_post([
+            'post_author' => $user->ID == 0 ? '1' : $user->ID,
             "post_type" => "review_flags",
             "post_title" => $_POST['reason'],
         ]);
@@ -573,6 +623,9 @@ class userAjax{
 
         if($insert > 0){
             $post_id = (int)sanitize_text_field( $_POST["post_id"] );
+
+            user::update_reviews_count($user->ID);
+
             $bussiness = new business($post_id);
             $star = round($bussiness->get_review_average() , 2);
             $data = [
@@ -616,7 +669,7 @@ class userAjax{
         $data = $trpiBusiness->get_reviews($args);
 
         foreach($data['result'] as $item){
-            include TRUST_PILOT_PATH . 'template/widgets/review-item.php';
+            include TRUST_PILOT_PATH . 'template/widgets/review-card.php';
         }
 
         include TRUST_PILOT_PATH . 'template/widgets/pagination.php';

@@ -12,9 +12,9 @@
     <div class="container-email" style="width:85%;margin:20px auto;background:#eee;padding:20px 30px;line-height:2;box-sizing:border-box;direction:rtl;">
         <div class="title-email" style="font-size:18px;font-weight:700;padding-right:9px;padding-bottom:14px;text-align:center;border-bottom:2px dashed #aaa;" >تایید حساب ایمیل در {site_name}</div>
         <div class="text-main">
-            <h4 class="hello-text">{company_name} گروه محترم</h4>
-            <p class="main">با تشکر از شما بابت تکمیل اطلاعات کاربری ، لطفا جهت تایید حساب ایمیل خود کد زیر را در صفحه تکمیل حساب کاربری سایت
-            <strong>{site_name}</strong> وارد نمایید.</p>
+            <h4 class="hello-text">{display_name} عزیز</h4>
+            <p class="main">کد تایید ایمیل شما در سایت 
+            <strong>{site_name}</strong> به صورت زیر است.</p>
             <p class="verification_code" style="background:#fff;display:table;text-align: center;width:170px;padding:12px;font-size: 20px;line-height: 48px;margin:auto;border-radius:5px;">{verification_code}</p>
             <!-- <p class="after_code">یا اینکه می توانید بر روی دکمه زیر کلیک کنید تا حساب ایمیلتان تایید شود.</p> -->
             <!-- <a class="button verification_link" href="{verification_link}" style="display:table;text-align:center;font-size: 14px;line-height:48px;background:#4caf50;width:170px;margin:20px auto;text-decoration:none;color:#fff;padding:12px;border-radius:5px;">تایید حساب ایمیل</a> -->

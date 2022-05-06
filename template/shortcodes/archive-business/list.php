@@ -1,11 +1,9 @@
 <?php
 
-function trpi_search_result_shortcode(){
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
+
+function trpi_buisiness_archive_shortcode(){
     ob_start();
-    if(!isset($_GET['search']) || empty($_GET['search'])){
-            echo "امکان نمایش نتایج بدون سرچ وجود ندارد!";
-        return;
-    }
 
     global $wpdb;
     $post_tbl = $wpdb->prefix.'posts';
@@ -16,17 +14,22 @@ function trpi_search_result_shortcode(){
 
     // ?city=تهران&count=25&period=365
 
-    $query = "SELECT business.ID , business.post_title AS title , COUNT(reviews.comment_ID) as total FROM $post_tbl AS business";
     $join  = "";
-    $join .= " JOIN $comment_tbl AS reviews ON business.ID = reviews.comment_post_ID ";
+    if( isset($_GET['period']) || isset($_GET['count']) ){
+        $query = "SELECT business.ID , business.post_title AS title , COUNT(reviews.comment_ID) as total FROM $post_tbl AS business";
+        $join .= " JOIN $comment_tbl AS reviews ON business.ID = reviews.comment_post_ID ";
+    }else{
+        $query = "SELECT business.ID , business.post_title AS title  FROM $post_tbl AS business";
+    }
     $join .= " JOIN $term_category_tbl AS category ON business.ID = category.object_id ";
     
     $where = " WHERE business.post_type = 'business' ";
     
     if(isset($_GET['city'])){
+        $key = TRUST_PILOT_PREFIX . 'city';
         $city  = sanitize_text_field($_GET['city']);
         $join .= " JOIN $post_meta_tbl AS meta ON business.ID = meta.post_id ";
-        $where .= " AND meta.meta_key = 'city' AND meta.meta_value LIKE '$city' ";
+        $where .= " AND meta.meta_key = '$key' AND meta.meta_value LIKE '%$city%' ";
     }
 
 
@@ -53,7 +56,8 @@ function trpi_search_result_shortcode(){
     $query .= $where;
 
     $groupBy = " GROUP BY business.ID ";
-    $having  = " HAVING total > 0 ";
+    // $having  = " HAVING total > 0 ";
+    $having  = "";
 
     if(isset($_GET['count'])){
         $count = (int)$_GET['count'];
@@ -74,51 +78,27 @@ function trpi_search_result_shortcode(){
     
     $query .= " LIMIT $offset, $per_page ";
 
-
     $result = $wpdb->get_results($query);
+    
 
+    
     if(count($result) > 0):
 
     foreach($result as $data):
-        ?>
-        
-        <div class="buisiness-item">
-            <div class="image">
-                <?php echo get_the_post_thumbnail($data->ID); ?>
-            </div>
-            <div class="details">
-                <h4><a href="<?php echo get_the_permalink($data->ID) ?>"><?php echo $data->title ?></a></h4>
-                <div class="wrapper_review_details">
-                    <div>
-                        <?php $rate =  get_post_meta($data->ID , "average_review_rates" , true); ?>
-                        <div class="trpi_wrapper_rating">
-                            <div class="buisiness_star_rating" data-rating="<?php echo $rate; ?>" ></div>
-                            <div><span><?php echo round($rate , 2); ?></span></div>
-                        </div>
-                    </div>
-                    <p><span>امتیاز</span><span> / </span></p>
-                    <?php $total = get_post_meta($data->ID , "total_reviews" , true); ?>
-                    <p><span> از </span><?php echo $total; ?><span> تجربه </span></p>
-                </div>
-            </div>
-        </div>
 
-        <?php
+        include __DIR__ . '/../../widgets/business-card.php';
+
     endforeach;
 
-    else:;
-
-        echo sprintf(__('هیچ نتیجه ای برای عبارت "%s" پیدا نشد!') , $search);
-
-    endif;;
+    endif;
 
     $data = [
         'total_page' => $total_page,
         'page'  => ( get_query_var('cpage') ? get_query_var('cpage') : 1 ),
     ];
     include_once TRUST_PILOT_PATH . "template/widgets/pagination.php";
-
+    
     return ob_get_clean();
 }
 
-add_shortcode("trpi_search_result" , "trpi_search_result_shortcode");
+add_shortcode("trpi_buisiness_archive" , "trpi_buisiness_archive_shortcode");
